@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Ca Trực - Đội Thông Tin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body { font-family: "Times New Roman", Times, serif; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid black !important; padding: 4px; text-align: center; }
+            [contenteditable="true"]:focus { outline: none; }
+        }
+        td { white-space: pre-line; vertical-align: top; }
+        .editable-cell { min-height: 45px; cursor: edit; }
+        .editable-cell:hover { background-color: #f0f9ff; }
+        .kip-label { font-size: 10px; font-weight: bold; color: #374151; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px dashed #d1d5db; display: inline-block; }
+    </style>
+</head>
+<body class="bg-gray-100 p-5">
+
+    <!-- Bảng điều khiển (Ẩn khi in) -->
+    <div class="no-print max-w-6xl mx-auto bg-white p-6 rounded shadow mb-10 border-t-4 border-blue-600">
+        <h2 class="text-xl font-bold mb-4 text-blue-700 uppercase">Cấu hình 2 Ca - 4 Kíp (Quy luật 4 ngày)</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="p-3 border rounded bg-blue-50">
+                <input type="text" id="nameKipA" value="Kíp A" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-blue-300 uppercase">
+                <textarea id="listKipA" class="w-full text-xs h-24 p-1 border rounded">Nhâm Mạnh Đạt (KT)&#10;Đỗ Xuân Trường&#10;Ngô Vi Ngoán</textarea>
+            </div>
+            <div class="p-3 border rounded bg-green-50">
+                <input type="text" id="nameKipB" value="Kíp B" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-green-300 uppercase">
+                <textarea id="listKipB" class="w-full text-xs h-24 p-1 border rounded">Nguyễn Tá Đại Phước (KT)&#10;Trần Văn Trường&#10;Nguyễn Chí Thanh</textarea>
+            </div>
+            <div class="p-3 border rounded bg-yellow-50">
+                <input type="text" id="nameKipC" value="Kíp C" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-yellow-300 uppercase">
+                <textarea id="listKipC" class="w-full text-xs h-24 p-1 border rounded">Phan Trọng Nhân (KT)&#10;Đặng Vũ Hiệp&#10;Nguyễn Việt Bắc</textarea>
+            </div>
+            <div class="p-3 border rounded bg-purple-50">
+                <input type="text" id="nameKipD" value="Kíp D" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-purple-300 uppercase">
+                <textarea id="listKipD" class="w-full text-xs h-24 p-1 border rounded">Đặng Chí Thanh (KT)&#10;Lê Thị Hương Nhân&#10;Tô Minh Tâm</textarea>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-semibold text-sm">Vị trí làm việc:</label>
+                <input type="text" id="workLocation" value="Phòng thiết bị trung tâm AACC/HCM" class="w-full border p-2 rounded text-sm">
+            </div>
+            <div class="flex items-end gap-3">
+                <button onclick="generateSchedule()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold shadow">Cập nhật theo quy luật mới</button>
+                <button onclick="window.print()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-bold shadow">Xuất PDF / In</button>
+            </div>
+        </div>
+        <p class="mt-3 text-xs text-gray-500 italic">* Quy luật: 1(A-B) -> 2(C-A) -> 3(D-B) -> 4(C-B). Chu kỳ 4 ngày lặp lại liên tục.</p>
+    </div>
+
+    <!-- Mẫu báo cáo -->
+    <div id="printArea" class="max-w-4xl mx-auto bg-white p-10 shadow-lg">
+        <div class="text-center mb-6">
+            <h3 class="font-bold uppercase">Công ty Quản lý Bay Miền Nam</h3>
+            <h3 class="font-bold uppercase underline">Đội Thông Tin - TT BĐKT</h3>
+            <br>
+            <h2 class="text-xl font-bold uppercase">Báo cáo danh sách ca trực</h2>
+            <p class="italic text-sm">Từ 01/05/2026 đến 31/05/2026</p>
+        </div>
+
+        <div class="mb-4 text-sm">
+            <p><strong>Vị trí làm việc:</strong> <span id="displayLocation">Phòng thiết bị trung tâm AACC/HCM</span></p>
+            <p><strong>Ca 1:</strong> 07H (LT) – 19H (LT). <strong>Ca 2:</strong> 19H (LT) – 07H (LT).</p>
+        </div>
+
+        <table class="w-full border-collapse border border-black">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="border border-black p-2 w-12 text-center">Ngày</th>
+                    <th class="border border-black p-2 w-[40%] text-center font-bold">Ca 1</th>
+                    <th class="border border-black p-2 w-[40%] text-center font-bold">Ca 2</th>
+                    <th class="border border-black p-2 text-center">Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+        </table>
+
+        <div class="mt-10 flex justify-end">
+            <div class="text-center w-64">
+                <p class="font-bold">Người lập bảng</p>
+                <br><br><br><br>
+                <p class="font-bold text-lg">Nguyễn Văn Trường</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateSchedule() {
+            document.getElementById('displayLocation').innerText = document.getElementById('workLocation').value;
+
+            const kips = {
+                A: { name: document.getElementById('nameKipA').value, staff: document.getElementById('listKipA').value },
+                B: { name: document.getElementById('nameKipB').value, staff: document.getElementById('listKipB').value },
+                C: { name: document.getElementById('nameKipC').value, staff: document.getElementById('listKipC').value },
+                D: { name: document.getElementById('nameKipD').value, staff: document.getElementById('listKipD').value }
+            };
+            
+            const tbody = document.getElementById('scheduleBody');
+            tbody.innerHTML = '';
+
+            for (let day = 1; day <= 31; day++) {
+                let dayStr = day < 10 ? '0' + day : day;
+                let k1, k2;
+
+                // Thuật toán xoay ca chu kỳ 4 ngày
+                const step = (day - 1) % 4;
+                switch(step) {
+                    case 0: k1 = kips.A; k2 = kips.B; break; // Ngày 1: A-B
+                    case 1: k1 = kips.C; k2 = kips.A; break; // Ngày 2: C-A
+                    case 2: k1 = kips.D; k2 = kips.B; break; // Ngày 3: D-B
+                    case 3: k1 = kips.C; k2 = kips.B; break; // Ngày 4: C-B
+                }
+
+                const row = `
+                    <tr>
+                        <td class="border border-black p-1 font-bold text-center">${dayStr}</td>
+                        <td class="border border-black p-2 text-left">
+                            <div contenteditable="true" class="kip-label outline-none">${k1.name}</div>
+                            <div contenteditable="true" class="editable-cell outline-none">${k1.staff}</div>
+                        </td>
+                        <td class="border border-black p-2 text-left">
+                            <div contenteditable="true" class="kip-label outline-none">${k2.name}</div>
+                            <div contenteditable="true" class="editable-cell outline-none">${k2.staff}</div>
+                        </td>
+                        <td contenteditable="true" class="border border-black p-1 outline-none text-sm"></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+        }
+        generateSchedule();
+    </script>
+</body>
+</html>
