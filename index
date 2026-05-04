@@ -7,85 +7,92 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
-            .no-print { display: none; }
-            body { font-family: "Times New Roman", Times, serif; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid black !important; padding: 4px; text-align: center; }
-            [contenteditable="true"]:focus { outline: none; }
+            .no-print, #exchangeModal, #loginSection { display: none !important; }
+            .print-only { display: block !important; }
+            body { font-family: "Times New Roman", Times, serif; background: white; }
+            .kip-tag { display: none !important; } 
         }
+        .print-only { display: none; }
         td { white-space: pre-line; vertical-align: top; }
-        .editable-cell { min-height: 45px; cursor: edit; }
-        .editable-cell:hover { background-color: #f0f9ff; }
-        .kip-label { font-size: 10px; font-weight: bold; color: #374151; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px dashed #d1d5db; display: inline-block; }
+        .editable-cell { min-height: 45px; padding: 4px; }
+        .kip-tag { font-size: 10px; font-weight: bold; color: #3b82f6; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px dashed #d1d5db; display: inline-block; }
+        #exchangeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .hidden-auth { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-100 p-5">
 
-    <!-- Bảng điều khiển (Ẩn khi in) -->
-    <div class="no-print max-w-6xl mx-auto bg-white p-6 rounded shadow mb-10 border-t-4 border-blue-600">
-        <h2 class="text-xl font-bold mb-4 text-blue-700 uppercase">Cấu hình 2 Ca - 4 Kíp (Quy luật 4 ngày)</h2>
-        
+    <!-- PHẦN ĐĂNG NHẬP -->
+    <div id="loginSection" class="no-print max-w-md mx-auto bg-white p-6 rounded shadow-lg mb-6 border-t-4 border-gray-500">
+        <h3 class="text-center font-bold mb-4 uppercase">Đăng nhập hệ thống</h3>
+        <div class="space-y-3">
+            <input type="text" id="userInput" placeholder="Tên đăng nhập" class="w-full border p-2 rounded text-sm">
+            <input type="password" id="passInput" placeholder="Mật khẩu" class="w-full border p-2 rounded text-sm">
+            <div class="flex gap-2">
+                <button onclick="login()" class="flex-1 bg-gray-700 text-white py-2 rounded font-bold hover:bg-gray-800">Đăng nhập</button>
+                <button onclick="logout()" id="btnLogout" class="hidden px-4 py-2 bg-red-100 text-red-600 rounded font-bold">Thoát</button>
+            </div>
+            <p id="loginMsg" class="text-xs text-center text-red-500 font-medium"></p>
+        </div>
+    </div>
+
+    <!-- BẢNG ĐIỀU KHIỂN (Chỉ Admin thấy toàn bộ) -->
+    <div id="adminPanel" class="no-print max-w-6xl mx-auto bg-white p-6 rounded shadow mb-10 border-t-4 border-blue-600 hidden-auth">
+        <h2 class="text-xl font-bold mb-4 text-blue-700 uppercase">Cấu hình hệ thống (Admin)</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="p-3 border rounded bg-blue-50">
                 <input type="text" id="nameKipA" value="Kíp A" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-blue-300 uppercase">
-                <textarea id="listKipA" class="w-full text-xs h-24 p-1 border rounded">Nhâm Mạnh Đạt (KT)&#10;Đỗ Xuân Trường&#10;Ngô Vi Ngoán</textarea>
+                <textarea id="listKipA" class="w-full text-xs h-20 p-1 border rounded">Nhâm Mạnh Đạt (KT)&#10;Đỗ Xuân Trường&#10;Ngô Vi Ngoán</textarea>
             </div>
             <div class="p-3 border rounded bg-green-50">
                 <input type="text" id="nameKipB" value="Kíp B" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-green-300 uppercase">
-                <textarea id="listKipB" class="w-full text-xs h-24 p-1 border rounded">Nguyễn Tá Đại Phước (KT)&#10;Trần Văn Trường&#10;Nguyễn Chí Thanh</textarea>
+                <textarea id="listKipB" class="w-full text-xs h-20 p-1 border rounded">Nguyễn Tá Đại Phước (KT)&#10;Trần Văn Trường&#10;Nguyễn Chí Thanh</textarea>
             </div>
             <div class="p-3 border rounded bg-yellow-50">
                 <input type="text" id="nameKipC" value="Kíp C" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-yellow-300 uppercase">
-                <textarea id="listKipC" class="w-full text-xs h-24 p-1 border rounded">Phan Trọng Nhân (KT)&#10;Đặng Vũ Hiệp&#10;Nguyễn Việt Bắc</textarea>
+                <textarea id="listKipC" class="w-full text-xs h-20 p-1 border rounded">Phan Trọng Nhân (KT)&#10;Đặng Vũ Hiệp&#10;Nguyễn Việt Bắc</textarea>
             </div>
             <div class="p-3 border rounded bg-purple-50">
                 <input type="text" id="nameKipD" value="Kíp D" class="w-full font-bold mb-2 border-b bg-transparent outline-none border-purple-300 uppercase">
-                <textarea id="listKipD" class="w-full text-xs h-24 p-1 border rounded">Đặng Chí Thanh (KT)&#10;Lê Thị Hương Nhân&#10;Tô Minh Tâm</textarea>
+                <textarea id="listKipD" class="w-full text-xs h-20 p-1 border rounded">Đặng Chí Thanh (KT)&#10;Lê Thị Hương Nhân&#10;Tô Minh Tâm</textarea>
             </div>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1">
                 <label class="block font-semibold text-sm">Vị trí làm việc:</label>
                 <input type="text" id="workLocation" value="Phòng thiết bị trung tâm AACC/HCM" class="w-full border p-2 rounded text-sm">
             </div>
-            <div class="flex items-end gap-3">
-                <button onclick="generateSchedule()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold shadow">Cập nhật theo quy luật mới</button>
-                <button onclick="window.print()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-bold shadow">Xuất PDF / In</button>
-            </div>
+            <button onclick="generateSchedule()" class="bg-blue-600 text-white px-5 py-2 rounded font-bold shadow hover:bg-blue-700">Tạo lại lịch</button>
         </div>
-        <p class="mt-3 text-xs text-gray-500 italic">* Quy luật: 1(A-B) -> 2(C-A) -> 3(D-B) -> 4(C-B). Chu kỳ 4 ngày lặp lại liên tục.</p>
     </div>
 
-    <!-- Mẫu báo cáo -->
-    <div id="printArea" class="max-w-4xl mx-auto bg-white p-10 shadow-lg">
+    <!-- THANH CÔNG CỤ CHUNG (Admin & NV đều thấy) -->
+    <div id="commonTools" class="no-print max-w-6xl mx-auto mb-4 flex gap-3 hidden-auth">
+        <button onclick="openExchangeModal()" class="bg-orange-500 text-white px-6 py-2 rounded font-bold shadow hover:bg-orange-600"> + Tạo Phiếu Đổi Ca</button>
+        <button onclick="window.print()" class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow hover:bg-green-700"> In Báo Cáo Lịch</button>
+    </div>
+
+    <!-- BÁO CÁO LỊCH TRỰC CHÍNH -->
+    <div id="mainReport" class="max-w-4xl mx-auto bg-white p-10 shadow-lg mb-10">
         <div class="text-center mb-6">
-            <h3 class="font-bold uppercase">Công ty Quản lý Bay Miền Nam</h3>
-            <h3 class="font-bold uppercase underline">Đội Thông Tin - TT BĐKT</h3>
-            <br>
-            <h2 class="text-xl font-bold uppercase">Báo cáo danh sách ca trực</h2>
-            <p class="italic text-sm">Từ 01/05/2026 đến 31/05/2026</p>
+            <h3 class="font-bold uppercase text-sm">Công ty Quản lý Bay Miền Nam</h3>
+            <h3 class="font-bold uppercase underline text-sm">Đội Thông Tin - TT BĐKT</h3>
+            <h2 class="text-xl font-bold uppercase mt-5">Báo cáo danh sách ca trực</h2>
+            <p class="italic">Tháng 05 năm 2026</p>
         </div>
-
-        <div class="mb-4 text-sm">
-            <p><strong>Vị trí làm việc:</strong> <span id="displayLocation">Phòng thiết bị trung tâm AACC/HCM</span></p>
-            <p><strong>Ca 1:</strong> 07H (LT) – 19H (LT). <strong>Ca 2:</strong> 19H (LT) – 07H (LT).</p>
-        </div>
-
-        <table class="w-full border-collapse border border-black">
+        <table class="w-full border-collapse border border-black text-sm">
             <thead>
-                <tr class="bg-gray-50">
+                <tr class="bg-gray-100">
                     <th class="border border-black p-2 w-12 text-center">Ngày</th>
-                    <th class="border border-black p-2 w-[40%] text-center font-bold">Ca 1</th>
-                    <th class="border border-black p-2 w-[40%] text-center font-bold">Ca 2</th>
+                    <th class="border border-black p-2 w-[40%] font-bold text-center">Ca 1 (07H-19H)</th>
+                    <th class="border border-black p-2 w-[40%] font-bold text-center">Ca 2 (19H-07H)</th>
                     <th class="border border-black p-2 text-center">Ghi chú</th>
                 </tr>
             </thead>
             <tbody id="scheduleBody"></tbody>
         </table>
-
-        <div class="mt-10 flex justify-end">
-            <div class="text-center w-64">
+        <div class="mt-10 flex justify-end text-center">
+            <div class="w-64">
                 <p class="font-bold">Người lập bảng</p>
                 <br><br><br><br>
                 <p class="font-bold text-lg">Nguyễn Văn Trường</p>
@@ -93,48 +100,142 @@
         </div>
     </div>
 
-    <script>
-        function generateSchedule() {
-            document.getElementById('displayLocation').innerText = document.getElementById('workLocation').value;
+    <!-- POPUP PHIẾU ĐỔI CA -->
+    <div id="exchangeModal" class="no-print">
+        <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md">
+            <h3 class="text-lg font-bold border-b pb-2 mb-4 text-orange-600 uppercase text-center">Thông tin Phiếu Đổi Ca</h3>
+            <div class="space-y-3 text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="font-bold">Ngày xin đổi:</label><input type="text" id="fDate" class="w-full border p-2 rounded"></div>
+                    <div><label class="font-bold text-blue-600">Ngày trả ca:</label><input type="text" id="fReturnDate" class="w-full border border-blue-300 p-2 rounded"></div>
+                </div>
+                <div><label class="font-bold">Người xin đổi (Ca cũ):</label><input type="text" id="fStaffOld" class="w-full border p-2 rounded"></div>
+                <div><label class="font-bold">Người nhận đổi (Ca mới):</label><input type="text" id="fStaffNew" class="w-full border p-2 rounded"></div>
+                <div><label class="font-bold">Lý do:</label><textarea id="fReason" class="w-full border p-2 rounded h-16">Giải quyết việc gia đình</textarea></div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal()" class="px-4 py-2 border rounded shadow">Đóng</button>
+                <button onclick="printExchangeFile()" class="px-4 py-2 bg-orange-500 text-white rounded font-bold shadow">In Phiếu</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- MẪU PHIẾU ĐỔI CA KHI XUẤT FILE -->
+    <div id="exchangePrintArea" class="print-only max-w-4xl mx-auto p-12 bg-white">
+        <div class="flex justify-between mb-8">
+            <div class="text-center font-bold text-sm uppercase">Công ty QLB Miền Nam<br>Trung tâm BĐKT</div>
+            <div class="text-center font-bold text-sm uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br><span class="underline">Độc lập - Tự do - Hạnh phúc</span></div>
+        </div>
+        <div class="text-center my-10 text-xl font-bold uppercase underline">PHIẾU XIN ĐỔI CA TRỰC</div>
+        <div class="space-y-6 text-lg leading-relaxed">
+            <p><strong>Kính gửi:</strong> Lãnh đạo Đội Thông Tin - TT BĐKT.</p>
+            <p>Tôi tên là: <span id="outOld" class="font-bold italic border-b border-black px-2">...</span></p>
+            <p>Đề nghị xin đổi ca trực ngày <span id="outDate" class="font-bold border-b border-black px-2">...</span> cho đồng chí: <span id="outNew" class="font-bold italic border-b border-black px-2">...</span></p>
+            <p>Thời gian trả ca dự kiến vào ngày: <span id="outReturnDate" class="font-bold border-b border-black px-2 italic">...</span></p>
+            <p><strong>Lý do:</strong> <span id="outReason" class="italic">...</span></p>
+            <p class="mt-4 italic text-right">Ngày lập phiếu: <span id="pNowDate">...</span></p>
+        </div>
+        <div class="grid grid-cols-3 text-center mt-20 gap-4">
+            <div><p class="font-bold underline">Người đề nghị</p></div>
+            <div><p class="font-bold underline">Người nhận đổi</p></div>
+            <div><p class="font-bold underline">Lãnh đạo phê duyệt</p></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        function login() {
+            const u = document.getElementById('userInput').value;
+            const p = document.getElementById('passInput').value;
+            const msg = document.getElementById('loginMsg');
+
+            if (u === 'admin' && p === 'admin123') {
+                currentUser = 'admin';
+                showUI('admin');
+            } else if (u === 'nv' && p === '123456') {
+                currentUser = 'nv';
+                showUI('nv');
+            } else {
+                msg.innerText = "Sai tên đăng nhập hoặc mật khẩu!";
+            }
+        }
+
+        function showUI(role) {
+            document.getElementById('loginMsg').innerText = "";
+            document.getElementById('btnLogout').classList.remove('hidden');
+            document.getElementById('commonTools').classList.remove('hidden-auth');
+            
+            const cells = document.querySelectorAll('.editable-cell');
+            
+            if (role === 'admin') {
+                document.getElementById('adminPanel').classList.remove('hidden-auth');
+                cells.forEach(c => c.setAttribute('contenteditable', 'true'));
+            } else {
+                document.getElementById('adminPanel').classList.add('hidden-auth');
+                cells.forEach(c => c.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            location.reload();
+        }
+
+        function openExchangeModal() { document.getElementById('exchangeModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('exchangeModal').style.display = 'none'; }
+
+        function printExchangeFile() {
+            const now = new Date();
+            document.getElementById('pNowDate').innerText = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+            document.getElementById('outDate').innerText = document.getElementById('fDate').value;
+            document.getElementById('outReturnDate').innerText = document.getElementById('fReturnDate').value;
+            document.getElementById('outOld').innerText = document.getElementById('fStaffOld').value;
+            document.getElementById('outNew').innerText = document.getElementById('fStaffNew').value;
+            document.getElementById('outReason').innerText = document.getElementById('fReason').value;
+            
+            document.getElementById('mainReport').classList.add('no-print');
+            window.print();
+            setTimeout(() => {
+                document.getElementById('mainReport').classList.remove('no-print');
+                closeModal();
+            }, 500);
+        }
+
+        function generateSchedule() {
             const kips = {
                 A: { name: document.getElementById('nameKipA').value, staff: document.getElementById('listKipA').value },
                 B: { name: document.getElementById('nameKipB').value, staff: document.getElementById('listKipB').value },
                 C: { name: document.getElementById('nameKipC').value, staff: document.getElementById('listKipC').value },
                 D: { name: document.getElementById('nameKipD').value, staff: document.getElementById('listKipD').value }
             };
-            
             const tbody = document.getElementById('scheduleBody');
             tbody.innerHTML = '';
 
-            for (let day = 1; day <= 31; day++) {
-                let dayStr = day < 10 ? '0' + day : day;
+            for (let d = 1; d <= 31; d++) {
+                let dS = d < 10 ? '0' + d : d;
                 let k1, k2;
-
-                // Thuật toán xoay ca chu kỳ 4 ngày
-                const step = (day - 1) % 4;
+                const step = (d - 1) % 4;
                 switch(step) {
-                    case 0: k1 = kips.A; k2 = kips.B; break; // Ngày 1: A-B
-                    case 1: k1 = kips.C; k2 = kips.A; break; // Ngày 2: C-A
-                    case 2: k1 = kips.D; k2 = kips.B; break; // Ngày 3: D-B
-                    case 3: k1 = kips.C; k2 = kips.B; break; // Ngày 4: C-B
+                    case 0: k1 = kips.A; k2 = kips.B; break;
+                    case 1: k1 = kips.C; k2 = kips.A; break;
+                    case 2: k1 = kips.D; k2 = kips.B; break;
+                    case 3: k1 = kips.C; k2 = kips.B; break;
                 }
-
-                const row = `
+                const isEditable = currentUser === 'admin' ? 'true' : 'false';
+                tbody.innerHTML += `
                     <tr>
-                        <td class="border border-black p-1 font-bold text-center">${dayStr}</td>
+                        <td class="border border-black p-1 font-bold text-center">${dS}</td>
                         <td class="border border-black p-2 text-left">
-                            <div contenteditable="true" class="kip-label outline-none">${k1.name}</div>
-                            <div contenteditable="true" class="editable-cell outline-none">${k1.staff}</div>
+                            <div class="kip-tag">${k1.name}</div>
+                            <div contenteditable="${isEditable}" class="editable-cell outline-none">${k1.staff}</div>
                         </td>
                         <td class="border border-black p-2 text-left">
-                            <div contenteditable="true" class="kip-label outline-none">${k2.name}</div>
-                            <div contenteditable="true" class="editable-cell outline-none">${k2.staff}</div>
+                            <div class="kip-tag">${k2.name}</div>
+                            <div contenteditable="${isEditable}" class="editable-cell outline-none">${k2.staff}</div>
                         </td>
-                        <td contenteditable="true" class="border border-black p-1 outline-none text-sm"></td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                        <td contenteditable="${isEditable}" class="border border-black p-1 outline-none text-xs"></td>
+                    </tr>`;
             }
         }
         generateSchedule();
